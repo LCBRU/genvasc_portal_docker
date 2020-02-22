@@ -1,55 +1,25 @@
 version: '2'
 
 services:
-  etl:
-    restart: always
-    build: ./etl
-    environment:
-      - GGPP_DB_HOST
-      - GGPP_DB_NAME
-      - GGPP_DB_USER
-      - GGPP_DB_PASSWORD
-      - CIVI_CIVIDB_HOST
-      - CIVI_DRUPALDB_NAME
-      - GGPP_ETL_USER
-      - GGPP_ETL_PASSWORD
-      - CIVI_CIVIDB_NAME
-      - CIVI_CUSTAB_GENVASC_DATA
-      - CIVI_CUSTAB_CONTACT
-      - CIVI_CUSTAB_SURGERY
-      - CIVI_CUSCOL_GENVASC_ID
-      - CIVI_CUSCOL_NHS_NUMBER
-      - CIVI_CUSCOL_PRACTICE_CODE
-      - CIVI_CUSID_CASE_STATUS_GROUP
-      - CIVI_CUSID_RECRUITER_RELATIONSHIP_TYPE
-      - CIVI_CUSID_PRACTICE_RELATIONSHIP_TYPE
-      - CIVI_CUSID_GENVASC_CASE_TYPE
-      - RCINT_DB_HOST
-      - RCINT_DB_NAME
-      - CIVI_CUSID_SUBMITTED_FOR_REIMBURSEMENT_ACTIVITY_TYPE
-      - CIVI_CUSID_ACTIVITY_STATUS_GROUP
-      - ADMIN_EMAIL_ADDRESS
   web:
+    env_file:
+     - .env
     restart: always
     build: ./web
     expose:
-      - "8000"
-    environment:
-      - GGPP_FLASK_SECRET_KEY
-      - GGPP_FLASK_DEBUG
-      - GGPP_DB_HOST
-      - GGPP_DB_NAME
-      - GGPP_DB_USER
-      - GGPP_DB_PASSWORD
-      - GGPP_SQLALCHEMY_TRACK_MODIFICATIONS
-      - GGPP_SQLALCHEMY_ECHO
-      - GGPP_SECURITY_PASSWORD_HASH
-      - GGPP_SECURITY_PASSWORD_SALT
-      - GGPP_SECURITY_TRACKABLE
-      - LCBRUIT_EMAIL_ADDRESS
-      - ADMIN_EMAIL_ADDRESS
-      - MAIL_SERVER
-      - SQLALCHEMY_DATABASE_URI=mysql://${GGPP_DB_USER}:${GGPP_DB_PASSWORD}@${GGPP_DB_HOST}/${GGPP_DB_NAME}
-    command: /usr/local/bin/gunicorn --config gunicorn.conf -w 2 -b :8000 app:app
+      - "${WEB_PORT}"
     ports:
-      - "8000:8000"
+      - "${WEB_PORT}:8000"
+    command: /usr/local/bin/gunicorn --log-file=- --capture-output --config gunicorn.conf -w 2 -b :8000 app:application
+  worker:
+    env_file:
+     - .env
+    restart: always
+    build: ./web
+    command: celery -A celery_worker.celery worker
+  beat:
+    env_file:
+     - .env
+    restart: always
+    build: ./web
+    command: celery --pidfile= -A celery_worker.celery beat
