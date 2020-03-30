@@ -10,7 +10,7 @@ services:
       - "${WEB_PORT}"
     ports:
       - "${WEB_PORT}:8000"
-    command: /usr/local/bin/gunicorn --log-file=- --capture-output --config gunicorn.conf -w 2 -b :8000 app:application
+    command: /usr/local/bin/gunicorn --log-file=- --capture-output --config gunicorn.conf -w 2 -b :8000 app:application --timeout 300
   worker:
     env_file:
      - .env
