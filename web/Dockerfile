@@ -9,7 +9,7 @@ RUN apt-get update && \
         default-mysql-client && \
     apt-get clean
 
-RUN echo "2010-05-12 B"
+RUN echo "2010-05-12 C"
 
 RUN svn export --force https://github.com/LCBRU/genvasc_portal_web/trunk/ /usr/src/app/
 ADD gunicorn.conf /usr/src/app/gunicorn.conf
