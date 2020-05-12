@@ -11,5 +11,6 @@ RUN apt-get update && \
 
 RUN svn export --force https://github.com/LCBRU/genvasc_portal_web/trunk/ /usr/src/app/
 ADD gunicorn.conf /usr/src/app/gunicorn.conf
+RUN echo "2010-05-12 A"
 
 RUN pip install --no-cache-dir -r requirements.txt
