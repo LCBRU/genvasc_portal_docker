@@ -5,7 +5,10 @@ services:
     env_file:
      - .env
     restart: always
-    build: ./web
+    build:
+      context: ./web
+      args:
+        version: ${VERSION}
     expose:
       - "${WEB_PORT}"
     ports:
@@ -15,11 +18,17 @@ services:
     env_file:
      - .env
     restart: always
-    build: ./web
+    build:
+      context: ./web
+      args:
+        version: ${VERSION}
     command: celery -A celery_worker.celery worker
   beat:
     env_file:
      - .env
     restart: always
-    build: ./web
+    build:
+      context: ./web
+      args:
+        version: ${VERSION}
     command: celery --pidfile= -A celery_worker.celery beat
