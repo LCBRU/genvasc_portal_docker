@@ -1,34 +1,22 @@
-version: '2'
-
 services:
   web:
     env_file:
      - .env
     restart: always
-    build:
-      context: ./web
-      args:
-        version: ${VERSION}
+    image: lcbruit/genvasc_portal_web:latest
     expose:
       - "${WEB_PORT}"
     ports:
-      - "${WEB_PORT}:8000"
-    command: /usr/local/bin/gunicorn --log-file=- --capture-output --config gunicorn.conf -w 2 -b :8000 app:application --timeout 300
+      - "${WEB_PORT}:8080"
   worker:
     env_file:
      - .env
     restart: always
-    build:
-      context: ./web
-      args:
-        version: ${VERSION}
-    command: celery -A celery_worker.celery worker
+    image: lcbruit/genvasc_portal_celery:latest
+    command: worker
   beat:
     env_file:
      - .env
     restart: always
-    build:
-      context: ./web
-      args:
-        version: ${VERSION}
-    command: celery --pidfile= -A celery_worker.celery beat
+    image: lcbruit/genvasc_portal_celery:latest
+    command: beat --pidfile=
